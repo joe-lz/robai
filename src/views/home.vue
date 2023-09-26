@@ -10,34 +10,27 @@
         <div class="flex-1 mx-2 mt-20 mb-2" ref="chatListDom">
             <!-- 循环messageList打印-->
             <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg"
-                    v-for="item of messageList.filter((v) => v.role !== 'web')">
+                v-for="item of messageList.filter((v) => v.role !== 'web')">
                 <div class="flex justify-between items-center mb-2">
                     <!-- 显示角色-->
                     <div class="font-bold">{{ roleAlias[item.role] }}：</div>
                     <!-- 拷贝到剪切板-->
-                    <Copy class="invisible group-hover:visible" :content="item.content"/>
+                    <Copy class="invisible group-hover:visible" :content="item.content" />
                 </div>
                 <div>
                     <!--显示对话内容-->
-                    <div class="prose text-sm text-slate-600 leading-relaxed"
-                            v-if="item.content"
-                            v-html="md.render(item.content)"
-                    >
+                    <div class="prose text-sm text-slate-600 leading-relaxed" v-if="item.content"
+                        v-html="md.render(item.content)">
                     </div>
-                    <Loading v-else/>
+                    <Loading v-else />
                 </div>
             </div>
         </div>
 
         <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
             <div class="flex">
-                <input
-                        class="input"
-                        :type="'text'"
-                        :placeholder="'请输入'"
-                        v-model="userSay"
-                        @keydown.enter="isTalking || sendMessage()"
-                />
+                <input class="input" :type="'text'" :placeholder="'请输入'" v-model="userSay"
+                    @keydown.enter="isTalking || sendMessage()" />
                 <button class="btn" :disabled="isTalking" @click="sendMessage()">
                     发送
                 </button>
@@ -52,17 +45,17 @@
 </template>
 
 <script setup lang="ts">
-import type {ChatMessage} from "@/types";
-import {ref, watch, nextTick, onMounted} from "vue";
-import Loading from "@/components/Loding.vue";
 import Copy from "@/components/Copy.vue";
-import {md} from "@/libs/markdown";
+import Loading from "@/components/Loding.vue";
+import { md } from "@/libs/markdown";
+import type { ChatMessage } from "@/types";
+import { nextTick, onMounted, ref, watch } from "vue";
 
 
 let isTalking = ref(false);
 let userSay = ref("");
 const chatListDom = ref<HTMLDivElement>();
-const roleAlias = {user: "ME", assistant: "AI", web: "WEB"};
+const roleAlias = { user: "ME", assistant: "AI", web: "WEB" };
 const messageList = ref<ChatMessage[]>([
     {
         role: "assistant",
@@ -131,7 +124,7 @@ onMounted(() => {
     ws.onerror = (event) => {
         console.error("WebSocket 发生错误：", event);
         messageList.value = [];
-        messageList.value.push({role: "web", content: "_客官,服务出现了一些问题,稍作休息,等一会访问啦!_"});
+        messageList.value.push({ role: "web", content: "_客官,服务出现了一些问题,稍作休息,等一会访问啦!_" });
     };
     //接受服务端发送过来的消息
     ws.onclose = (event) => {
@@ -144,9 +137,9 @@ const sendChatMessage = async (content: string = userSay.value) => {
         if (messageList.value.length === 1) {
             messageList.value.pop();
         }
-        messageList.value.push({role: "user", content});
+        messageList.value.push({ role: "user", content });
         clearMessageContent();
-        messageList.value.push({role: "assistant", content: ""});
+        messageList.value.push({ role: "assistant", content: "" });
         //发送消息到ws
         let sessionId = localStorage.getItem("sessionId");
         let timestamp = new Date().getTime();
@@ -157,13 +150,13 @@ const sendChatMessage = async (content: string = userSay.value) => {
             requestTime: timestamp
         };
         if (ws.readyState != WebSocket.OPEN) {
-            messageList.value.push({role: "web", content: "服务出现了一些问题,需要稍等一会访问啦!"});
+            messageList.value.push({ role: "web", content: "服务出现了一些问题,需要稍等一会访问啦!" });
             return;
         }
         ws.send(JSON.stringify(message));
     } catch (error: any) {
         console.error("发送消息发生了错误：", error);
-        messageList.value.push({role: "web", content: "服务出现了一些问题,需要稍等一会访问啦!"});
+        messageList.value.push({ role: "web", content: "服务出现了一些问题,需要稍等一会访问啦!" });
     }
 };
 
@@ -198,9 +191,9 @@ watch(messageList.value, () => nextTick(() => scrollToBottom()));
 <style scoped>
 pre {
     font-family: -apple-system, "Noto Sans", "Helvetica Neue", Helvetica,
-    "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB",
-    "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN",
-    "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti",
-    SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+        "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB",
+        "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN",
+        "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti",
+        SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
 }
 </style>
