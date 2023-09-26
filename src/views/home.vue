@@ -1,42 +1,75 @@
 <template>
-  <div class="flex flex-col h-screen">
-    <div class="flex flex-nowrap fixed w-full items-baseline top-0 px-6 py-4 bg-gray-100">
-      <div class="text-2xl font-bold">RobAI</div>
-      <div class="ml-4 text-sm text-gray-500">
-        每次沟通都是一次信息脉搏的跳动
-      </div>
+  <div class="qingshi-body">
+    <div class="qingshi-content-header">
+      <a href="">
+        <img src="../../img/logo.png" alt="" class="logo">
+      </a>
+      <span class="desc">创造信息价值!</span>
+      <div class="expand"></div>
+      <a href="">返回轻识</a>
     </div>
-
-    <div class="flex-1 mx-2 mt-20 mb-2" ref="chatListDom">
-      <!-- 循环messageList打印-->
-      <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg"
-        v-for="item of messageList.filter((v) => v.role !== 'web')">
-        <div class="flex justify-between items-center mb-2">
-          <!-- 显示角色-->
-          <div class="font-bold">{{ roleAlias[item.role] }}：</div>
-          <!-- 拷贝到剪切板-->
-          <Copy class="invisible group-hover:visible" :content="item.content" />
+    <div class="qingshi-content">
+      <div class="aside-menu">
+        <div class="aside-animation">
+          <LottieAnimation :animation-data="aiJSON" :auto-play="true" :loop="true" :speed="1" ref="anim" />
+          <span>AI</span>
         </div>
-        <div>
-          <!--显示对话内容-->
-          <div class="prose text-sm text-slate-600 leading-relaxed" v-if="item.content" v-html="md.render(item.content)">
+        <div class="menu-list">
+          <div class="menu-item">
+            <img src="../../img/message.png" alt="">
+            <span>对话</span>
           </div>
-          <Loading v-else />
+        </div>
+        <div class="links">
+          <a href="">设置</a>
+          <a href="">隐私政策</a>
+          <a href="">用户协议</a>
+          <a href="">关于我们</a>
+        </div>
+
+      </div>
+
+      <div class="flex flex-col chat-wrapper">
+        <!-- <div class="flex flex-nowrap fixed w-full items-baseline top-0 px-6 py-4 bg-gray-100">
+          <div class="text-2xl font-bold">RobAI</div>
+          <div class="ml-4 text-sm text-gray-500">
+            每次沟通都是一次信息脉搏的跳动
+          </div>
+        </div> -->
+
+        <div class="flex-1 mx-2 mb-2 chatListDom">
+          <!-- 循环messageList打印-->
+          <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg"
+            v-for="item of messageList.filter((v) => v.role !== 'web')">
+            <div class="flex justify-between items-center mb-2">
+              <!-- 显示角色-->
+              <div class="font-bold">{{ roleAlias[item.role] }}：</div>
+              <!-- 拷贝到剪切板-->
+              <Copy class="invisible group-hover:visible" :content="item.content" />
+            </div>
+            <div>
+              <!--显示对话内容-->
+              <div class="prose text-sm text-slate-600 leading-relaxed" v-if="item.content"
+                v-html="md.render(item.content)">
+              </div>
+              <Loading v-else />
+            </div>
+          </div>
+        </div>
+
+        <div class="sticky bottom-0 w-full p-6 pb-8">
+          <div class="flex">
+            <input class="input" :type="'text'" :placeholder="'你可以问我任何问题...'" v-model="userSay"
+              @keydown.enter="isTalking || sendMessage()" />
+            <button class="btn" :disabled="isTalking" @click="sendMessage()">
+              发送
+            </button>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
-      <div class="flex">
-        <input class="input" :type="'text'" :placeholder="'请输入'" v-model="userSay"
-          @keydown.enter="isTalking || sendMessage()" />
-        <button class="btn" :disabled="isTalking" @click="sendMessage()">
-          发送
-        </button>
-      </div>
-    </div>
-    <div class="text-center">
-      <a href="https://beian.miit.gov.cn/" target="_blank" style="font-family: 'Microsoft YaHei', sans-serif;">
+    <div class="text-center beian">
+      <a href="https://beian.miit.gov.cn/" target="_blank">
         浙ICP备2023012570号-1
       </a>
     </div>
@@ -50,6 +83,17 @@ import { md } from "@/libs/markdown";
 import type { ChatMessage } from "@/types";
 import { nextTick, onMounted, ref, watch } from "vue";
 
+import { LottieAnimation } from "lottie-web-vue";
+import aiJSON from "../../img/ai.json";
+
+let anim = ref()
+
+onMounted(() => {
+  setTimeout(() => {
+    console.log(anim.value.goToAndPlay(150, true))
+    anim.value
+  }, 500)
+})
 
 let isTalking = ref(false);
 let userSay = ref("");
@@ -188,11 +232,140 @@ watch(messageList.value, () => nextTick(() => scrollToBottom()));
 </script>
 
 <style scoped>
-pre {
-  font-family: -apple-system, "Noto Sans", "Helvetica Neue", Helvetica,
-    "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB",
-    "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN",
-    "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti",
-    SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+a {
+  color: #9195a3;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #006eff;
+}
+
+.qingshi-body {
+  background-color: #eaf2ff;
+  padding: 0 15px;
+  min-height: 100vh;
+}
+
+.qingshi-content {
+  /* background-color: white; */
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 700px;
+  display: flex;
+}
+
+.qingshi-content-header {
+  display: flex;
+  align-items: center;
+  padding: 30px 0px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.qingshi-content-header img {
+  height: 30px;
+}
+
+.qingshi-content-header .desc {
+  font-size: 14px;
+  color: #9195a3;
+  padding-left: 30px;
+}
+
+.expand {
+  flex: 1;
+}
+
+.aside-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  width: 300px;
+  background-color: white;
+}
+
+.aside-animation {
+  position: relative;
+  width: 150px;
+  margin: 0 auto;
+  margin-bottom: 30px;
+}
+
+.aside-animation span {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  margin-left: -15px;
+  font-size: 30px;
+  font-weight: bold;
+  /* color: #006eff; */
+  color: white;
+
+}
+
+.menu-list {
+  flex: 1;
+}
+
+.aside-menu .links a {
+  display: block;
+  height: 44px;
+  line-height: 44px;
+}
+
+.menu-list .menu-item {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  background-color: #eaf2ff;
+  border-radius: 6px;
+  padding-left: 30px;
+}
+
+.menu-item img {
+  height: 20px;
+  margin-right: 10px;
+}
+
+.menu-item span {
+  color: #006eff;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.chat-wrapper {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.sticky .input {
+  border-radius: 30px;
+  box-shadow: 0 4px 16px 0 #eaf2ff;
+  height: 44px;
+  border: none;
+  padding: 0 25px;
+  font-size: 16px;
+}
+
+.sticky .btn {
+  border-radius: 30px;
+  padding: 0 30px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.beian {
+  padding: 15px 0;
+}
+
+.beian a {
+  font-size: 12px;
 }
 </style>
